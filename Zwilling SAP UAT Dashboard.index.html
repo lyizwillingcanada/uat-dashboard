@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAP UAT Command Centre · Zwilling Canada Q1 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #f0f3f8;
+  --ink2: #ffffff;
+  --ink3: #e8edf5;
+  --ink4: #dde3ef;
+  --muted: #c2cade;
+  --dim: #7a8aaa;
+  --ghost: #4a5570;
+  --fog: #1e2a40;
+  --paper: #f7f9fc;
+  --white: #ffffff;
+
+  --red:    #e63946;
+  --red2:   #ff6b74;
+  --redbg:  rgba(230,57,70,.12);
+  --green:  #2dce89;
+  --green2: #5de3a8;
+  --greenbg:rgba(45,206,137,.12);
+  --amber:  #f4a261;
+  --amberbg:rgba(244,162,97,.12);
+  --blue:   #4895ef;
+  --bluebg: rgba(72,149,239,.12);
+  --purple: #7b5ea7;
+  --purpbg: rgba(123,94,167,.12);
+  --teal:   #2ec4b6;
+  --tealbg: rgba(46,196,182,.12);
+
+  --accent: #4895ef;
+  --accent-glow: rgba(72,149,239,.3);
+
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --r: 10px;
+  --r-sm: 6px;
+  --shadow: 0 4px 24px rgba(0,0,0,.35);
+  --shadow-sm: 0 2px 12px rgba(0,0,0,.25);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--ink);
+  color: var(--fog);
+  min-height: 100vh;
+  font-size: 14px;
+  overflow-x: hidden;
+}
+
+/* Ambient background */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 0%, rgba(72,149,239,.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 90% 100%, rgba(45,206,137,.05) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 80% at 50% 50%, rgba(240,243,248,1) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #e8edf5; }
+::-webkit-scrollbar-thumb { background: #b8c4d8; border-radius: 3px; }
+
+/* ── LAYOUT ── */
+.shell { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+/* ── HEADER ── */
+.topbar {
+  background: rgba(255,255,255,.97);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(0,0,0,.09);
+  box-shadow: 0 1px 8px rgba(0,0,0,.07);
+  padding: 0 28px;
+  position: sticky; top: 0; z-index: 200;
+}
+.topbar-inner {
+  display: flex; align-items: center; gap: 20px;
+  height: 58px;
+}
+.brand { display: flex; align-items: center; gap: 12px; margin-right: 8px; }
+.brand-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), #2ec4b6);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; box-shadow: 0 0 16px var(--accent-glow);
+  flex-shrink: 0;
+}
+.brand-text {}
+.brand-name { font-family: var(--font-head); font-weight: 800; font-size: 15px; color: #1e2a40; letter-spacing: -.3px; }
+.brand-sub { font-family: var(--font-mono); font-size: 10px; color: var(--dim); letter-spacing: .5px; }
+
+.nav-pills { display: flex; gap: 2px; flex: 1; }
+.nav-btn {
+  padding: 7px 16px; background: transparent; border: none;
+  color: var(--dim); font-size: 12px; font-weight: 600;
+  font-family: var(--font-body); cursor: pointer; border-radius: var(--r-sm);
+  transition: all .15s; letter-spacing: .2px; white-space: nowrap;
+}
+.nav-btn:hover { color: #1e2a40; background: rgba(0,0,0,.05); }
+.nav-btn.active { color: var(--accent); background: rgba(72,149,239,.12); }
+
+.topbar-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.live-chip {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 10px; color: #1a9e6a;
+  background: rgba(45,206,137,.12); border: 1px solid rgba(45,206,137,.3);
+  padding: 4px 10px; border-radius: 20px;
+}
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: #2dce89; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+
+.header-meta { font-family: var(--font-mono); font-size: 10px; color: var(--dim); text-align: right; line-height: 1.6; }
+.header-meta strong { color: #3a4a6a; }
+
+.name-wrap { display: flex; flex-direction: column; gap: 2px; }
+.name-label { font-family: var(--font-mono); font-size: 9px; color: var(--dim); text-transform: uppercase; letter-spacing: .6px; }
+.name-input {
+  background: #f0f3f8; border: 1px solid #c8d0e0;
+  color: #1e2a40; padding: 5px 10px; border-radius: var(--r-sm);
+  font-size: 12px; width: 148px; font-family: var(--font-body); outline: none;
+  transition: border-color .2s;
+}
+.name-input:focus { border-color: var(--accent); }
+
+/* ── MAIN ── */
+.main { padding: 24px 28px; max-width: 1600px; margin: 0 auto; width: 100%; }
+.page { display: none; animation: fadeIn .25s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:none;} }
+
+/* ── PAGE HEADING ── */
+.page-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 22px; }
+.page-title { font-family: var(--font-head); font-size: 22px; font-weight: 800; color: #1e2a40; }
+.page-sub { font-family: var(--font-mono); font-size: 11px; color: var(--dim); }
+
+/* ── KPI STRIP ── */
+.kpi-strip { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; margin-bottom: 20px; }
+.kpi-card {
+  background: #ffffff; border: 1px solid #dde3ef;
+  border-radius: var(--r); padding: 14px 14px 12px; position: relative; overflow: hidden;
+  transition: transform .15s, box-shadow .15s;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.kpi-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+.kpi-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--accent-line, var(--accent));
+}
+.kpi-icon { font-size: 16px; margin-bottom: 8px; }
+.kpi-val { font-family: var(--font-mono); font-size: 24px; font-weight: 700; color: #1e2a40; line-height: 1; }
+.kpi-label { font-size: 10px; color: var(--dim); margin-top: 4px; text-transform: uppercase; letter-spacing: .5px; }
+
+/* ── CARDS ── */
+.card {
+  background: #ffffff; border: 1px solid #dde3ef;
+  border-radius: var(--r); overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+.card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; border-bottom: 1px solid #eaeff7;
+}
+.card-title { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: #1e2a40; }
+.card-body { padding: 16px 18px; }
+
+/* ── GRID LAYOUTS ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+.col-span-2 { grid-column: span 2; }
+.col-span-3 { grid-column: span 3; }
+
+/* ── TABLE ── */
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th {
+  background: #f4f7fc; padding: 9px 12px; text-align: left;
+  font-weight: 600; color: var(--dim); border-bottom: 1px solid #dde3ef;
+  font-size: 10px; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap;
+  font-family: var(--font-mono);
+}
+td { padding: 9px 12px; border-bottom: 1px solid #eaeff7; vertical-align: middle; color: #2e3d58; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f7f9fd; }
+
+/* ── BADGES ── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 20px; font-size: 9px; font-weight: 700;
+  font-family: var(--font-mono); text-transform: uppercase; letter-spacing: .4px; border: 1px solid;
+}
+.b-pass   { background: rgba(45,206,137,.13); color: #1a9e6a;  border-color: rgba(45,206,137,.35); }
+.b-fail   { background: rgba(230,57,70,.1);   color: #c0202c;  border-color: rgba(230,57,70,.3); }
+.b-prog   { background: rgba(72,149,239,.12); color: #2c6ec7;  border-color: rgba(72,149,239,.3); }
+.b-block  { background: rgba(244,162,97,.12); color: #b86c1a;  border-color: rgba(244,162,97,.35); }
+.b-scope  { background: rgba(123,94,167,.1);  color: #6b40b8;  border-color: rgba(123,94,167,.3); }
+.b-none   { background: #f0f3f8; color: #7a8aaa; border-color: #c8d0e0; }
+
+/* ── PROGRESS BAR ── */
+.bar-track { background: #e8edf5; border-radius: 4px; overflow: hidden; }
+.bar-fill  { height: 100%; border-radius: 4px; transition: width .6s ease; }
+
+/* ── MODULE BADGES ── */
+.mod-pill {
+  display: inline-block; padding: 2px 8px; border-radius: 5px;
+  font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+  border: 1px solid; letter-spacing: .3px;
+}
+
+/* ── EXECUTE TAB ── */
+.filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+.f-input, .f-select {
+  background: #ffffff; border: 1px solid #c8d0e0;
+  color: #2e3d58; padding: 8px 12px; border-radius: var(--r-sm);
+  font-size: 12px; font-family: var(--font-body); outline: none;
+  transition: border-color .2s;
+}
+.f-input:focus, .f-select:focus { border-color: var(--accent); }
+
+.f-input { width: 280px; }
+.f-select option { background: #ffffff; color: #2e3d58; }
+.f-count { margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: var(--dim); }
+
+.scenario-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.s-pill {
+  padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 600;
+  cursor: pointer; border: 1px solid #c8d0e0; color: #7a8aaa;
+  background: transparent; font-family: var(--font-mono); transition: all .15s;
+}
+.s-pill:hover { border-color: var(--accent); color: #2c6ec7; }
+.s-pill.on { background: rgba(72,149,239,.12); border-color: var(--accent); color: #2c6ec7; }
+
+.tc-list { display: flex; flex-direction: column; gap: 8px; }
+.tc-row {
+  background: #ffffff; border: 1px solid #dde3ef;
+  border-left: 3px solid transparent;
+  border-radius: var(--r); padding: 14px 16px;
+  display: flex; align-items: flex-start; gap: 14px;
+  transition: box-shadow .15s, transform .1s;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+.tc-row:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); transform: translateX(2px); }
+.tc-id-box { min-width: 90px; }
+.tc-id-code { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: #2c6ec7; margin-bottom: 6px; }
+.tc-body { flex: 1; min-width: 0; }
+.tc-tags { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 4px; }
+.tc-step-label { font-size: 10px; color: #7a8aaa; font-family: var(--font-mono); }
+.tc-desc { font-size: 12px; color: #2e3d58; margin-bottom: 5px; line-height: 1.45; }
+.tc-meta { display: flex; gap: 12px; font-size: 10px; color: #7a8aaa; flex-wrap: wrap; font-family: var(--font-mono); }
+.tc-actions { display: flex; flex-direction: column; gap: 6px; min-width: 220px; }
+.action-row { display: flex; gap: 5px; flex-wrap: wrap; }
+
+/* ── BUTTONS ── */
+.btn {
+  padding: 6px 12px; border-radius: var(--r-sm); border: 1px solid;
+  cursor: pointer; font-size: 10px; font-weight: 700;
+  font-family: var(--font-mono); transition: all .15s; background: transparent;
+  letter-spacing: .3px; white-space: nowrap;
+}
+.btn-pass   { border-color: rgba(26,158,106,.5); color: #1a9e6a; }
+.btn-pass:hover { background: rgba(45,206,137,.1); }
+.btn-fail   { border-color: rgba(192,32,44,.4); color: #c0202c; }
+.btn-fail:hover { background: rgba(230,57,70,.08); }
+.btn-prog   { border-color: rgba(44,110,199,.4); color: #2c6ec7; }
+.btn-prog:hover { background: rgba(72,149,239,.1); }
+.btn-block  { border-color: rgba(184,108,26,.4); color: #b86c1a; }
+.btn-block:hover { background: rgba(244,162,97,.1); }
+.btn-edit   { border-color: #c8d0e0; color: #7a8aaa; width: 100%; }
+.btn-edit:hover { border-color: var(--accent); color: #2c6ec7; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; padding: 8px 18px; font-size: 12px; }
+.btn-primary:hover { background: #3580d4; box-shadow: 0 0 16px var(--accent-glow); }
+.btn-ghost { background: #f0f3f8; border-color: #c8d0e0; color: #2e3d58; padding: 8px 18px; font-size: 12px; }
+.btn-ghost:hover { border-color: #8494b4; }
+.btn-danger { background: rgba(230,57,70,.08); border-color: rgba(192,32,44,.4); color: #c0202c; padding: 8px 18px; font-size: 12px; }
+.btn-danger:hover { background: rgba(230,57,70,.15); }
+.btn-sm { padding: 4px 9px; font-size: 9px; }
+
+/* ── DEFECTS ── */
+.def-stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+.def-stat {
+  background: #ffffff; border: 1px solid #dde3ef;
+  border-radius: var(--r); padding: 16px; text-align: center; border-top: 2px solid;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+.def-stat-num { font-family: var(--font-mono); font-size: 28px; font-weight: 700; }
+.def-stat-lbl { font-size: 10px; color: var(--dim); margin-top: 4px; text-transform: uppercase; }
+
+/* ── MODAL ── */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(30,42,64,.4);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; padding: 20px;
+}
+.modal-bg.hidden { display: none; }
+.modal {
+  background: #ffffff; border: 1px solid #dde3ef;
+  border-radius: 14px; padding: 28px; max-width: 520px; width: 100%;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 12px 40px rgba(0,0,0,.15);
+  animation: modalIn .2s ease;
+}
+@keyframes modalIn { from{opacity:0;transform:scale(.96);} to{opacity:1;transform:scale(1);} }
+.modal h3 { font-family: var(--font-head); font-size: 17px; font-weight: 800; color: #1e2a40; margin-bottom: 18px; }
+.form-group { margin-bottom: 14px; }
+.form-label { display: block; font-size: 10px; font-weight: 600; color: #7a8aaa; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .5px; font-family: var(--font-mono); }
+.form-control {
+  width: 100%; background: #f4f7fc; border: 1px solid #c8d0e0;
+  color: #2e3d58; padding: 8px 12px; border-radius: var(--r-sm);
+  font-size: 12px; font-family: var(--font-body); outline: none;
+  transition: border-color .2s;
+}
+.form-control:focus { border-color: var(--accent); }
+.form-control option { background: #ffffff; color: #2e3d58; }
+textarea.form-control { height: 76px; resize: vertical; }
+.modal-foot { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  padding: 12px 18px; border-radius: 9px;
+  font-weight: 600; font-size: 12px; font-family: var(--font-mono);
+  z-index: 9999; border: 1px solid;
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s, transform .25s;
+  transform: translateY(8px);
+}
+.toast.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.toast.ok  { background: rgba(45,206,137,.12); border-color: rgba(26,158,106,.4); color: #1a9e6a; }
+.toast.err { background: rgba(230,57,70,.1);   border-color: rgba(192,32,44,.4);  color: #c0202c; }
+
+/* ── WEEKLY ── */
+.rate-chip {
+  display: inline-block; padding: 3px 10px; border-radius: 20px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700; border: 1px solid;
+}
+.mod-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 14px; margin-top: 16px; }
+.mod-card {
+  background: #ffffff; border: 1px solid #dde3ef;
+  border-radius: var(--r); padding: 16px; border-top: 2px solid;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+
+/* ── REPORTS ── */
+.readiness-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid #eaeff7;
+}
+.readiness-row:last-child { border-bottom: none; }
+.rr-icon { font-size: 17px; min-width: 24px; }
+.rr-info { flex: 1; }
+.rr-label { font-weight: 600; font-size: 12px; color: #2e3d58; }
+.rr-target { font-size: 10px; color: #7a8aaa; font-family: var(--font-mono); }
+.rr-val { font-weight: 700; font-family: var(--font-mono); font-size: 13px; }
+.export-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
+
+/* MODULE COLOURS */
+.m-sd  { color: #1d6fcc; border-color: rgba(29,111,204,.3); background: rgba(29,111,204,.08); }
+.m-mm  { color: #1a9e6a; border-color: rgba(26,158,106,.3); background: rgba(26,158,106,.08); }
+.m-pur { color: #7c3aed; border-color: rgba(124,58,237,.3); background: rgba(124,58,237,.08); }
+.m-ret { color: #b86c1a; border-color: rgba(184,108,26,.3); background: rgba(184,108,26,.08); }
+.m-ap  { color: #c0202c; border-color: rgba(192,32,44,.3);  background: rgba(192,32,44,.08); }
+.m-ar  { color: #be185d; border-color: rgba(190,24,93,.3);  background: rgba(190,24,93,.08); }
+.m-gl  { color: #047857; border-color: rgba(4,120,87,.3);   background: rgba(4,120,87,.08); }
+.m-co  { color: #0e7490; border-color: rgba(14,116,144,.3); background: rgba(14,116,144,.08); }
+.m-sa  { color: #c2410c; border-color: rgba(194,65,12,.3);  background: rgba(194,65,12,.08); }
+.m-pcm { color: #4338ca; border-color: rgba(67,56,202,.3);  background: rgba(67,56,202,.08); }
+.m-wm  { color: #15803d; border-color: rgba(21,128,61,.3);  background: rgba(21,128,61,.08); }
+
+/* RESPONSIVE */
+@media(max-width:1100px) { .kpi-strip{grid-template-columns:repeat(4,1fr);} }
+@media(max-width:800px)  { .grid-2,.grid-3{grid-template-columns:1fr;} .kpi-strip{grid-template-columns:repeat(2,1fr);} .nav-pills{display:none;} }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ── TOPBAR ── -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      <div class="brand-text">
+        <div class="brand-name">UAT Command Centre</div>
+        <div class="brand-sub">ZWILLING CANADA · SAP S/4HANA RISE Q1 2026</div>
+      </div>
+    </div>
+    <nav class="nav-pills">
+      <button class="nav-btn active" onclick="showTab('dashboard',this)">📊 Dashboard</button>
+      <button class="nav-btn" onclick="showTab('execute',this)">✅ Execute Tests</button>
+      <button class="nav-btn" onclick="showTab('defects',this)">🐛 Defects</button>
+      <button class="nav-btn" onclick="showTab('weekly',this)">📅 Weekly Status</button>
+      <button class="nav-btn" onclick="showTab('reports',this)">📈 Reports</button>
+    </nav>
+    <div class="topbar-right">
+      <div class="live-chip"><div class="live-dot"></div>LIVE</div>
+      <div class="header-meta">
+        <div>Go-Live: <strong>Apr 27, 2026</strong></div>
+        <div>Go/No-Go: <strong>Apr 24, 2026</strong></div>
+      </div>
+      <div class="name-wrap">
+        <label class="name-label">Your Name</label>
+        <input class="name-input" id="testerName" placeholder="Enter name…">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <!-- ══ DASHBOARD ══ -->
+  <div id="page-dashboard" class="page active">
+    <div class="page-head">
+      <div class="page-title">Overview</div>
+      <div class="page-sub">UAT Execution · Mar 19 – Apr 4, 2026</div>
+    </div>
+    <div class="kpi-strip" id="kpiStrip"></div>
+    <div class="grid-2" style="margin-bottom:16px">
+      <div class="card col-span-2">
+        <div class="card-head">
+          <div class="card-title">Overall Execution Progress</div>
+          <div id="execRateLbl" style="font-family:var(--font-mono);font-size:12px;color:var(--dim)"></div>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--dim);margin-bottom:8px">
+            <span id="execProgLabel"></span>
+            <span id="legendRow" style="display:flex;gap:14px;flex-wrap:wrap"></span>
+          </div>
+          <div class="bar-track" style="height:12px;margin-bottom:0">
+            <div id="mainBar" class="bar-fill" style="background:linear-gradient(90deg,var(--accent),var(--teal))"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Execution by Module</div></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>Module</th><th>Lead</th><th>Total</th><th>Executed</th>
+            <th>Pass</th><th>Fail</th><th>Blocked</th><th>Pass Rate</th><th>Progress</th>
+          </tr></thead>
+          <tbody id="modTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ EXECUTE ══ -->
+  <div id="page-execute" class="page">
+    <div class="page-head">
+      <div class="page-title">Execute Tests</div>
+      <div class="page-sub">Record test outcomes against individual scenarios</div>
+    </div>
+    <div class="filters">
+      <input class="f-input" id="searchQ" placeholder="🔍  Search ID, description, scenario, tester…" oninput="renderTcList()">
+      <select class="f-select" id="modFilt" onchange="renderTcList();renderScenPills()"><option value="">All Modules</option></select>
+      <select class="f-select" id="statFilt" onchange="renderTcList()">
+        <option value="">All Statuses</option>
+        <option>Not Started</option><option>In Progress</option>
+        <option>Pass</option><option>Fail</option><option>Blocked</option><option>Not In Scope</option>
+      </select>
+      <select class="f-select" id="priFilt" onchange="renderTcList()">
+        <option value="">All Priorities</option>
+        <option>Critical</option><option>High</option><option>Medium</option>
+      </select>
+      <div class="f-count" id="tcCount"></div>
+    </div>
+    <div class="scenario-pills" id="scenPills"></div>
+    <div class="tc-list" id="tcList"></div>
+  </div>
+
+  <!-- ══ DEFECTS ══ -->
+  <div id="page-defects" class="page">
+    <div class="page-head" style="justify-content:space-between">
+      <div style="display:flex;align-items:baseline;gap:16px">
+        <div class="page-title">Defect Log</div>
+        <div class="page-sub">Track, triage & resolve issues</div>
+      </div>
+      <button class="btn btn-danger" onclick="openDefectModal('')">＋ Raise Defect</button>
+    </div>
+    <div class="def-stat-grid" id="defStatGrid"></div>
+    <div class="card">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>ID</th><th>Test Case</th><th>Title</th><th>Severity</th>
+            <th>Status</th><th>Raised By</th><th>Assigned To</th><th>Raised At</th><th></th>
+          </tr></thead>
+          <tbody id="defTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ WEEKLY ══ -->
+  <div id="page-weekly" class="page">
+    <div class="page-head">
+      <div class="page-title">Weekly Status Report</div>
+      <div class="page-sub">Pass / Fail Rate Summary · Q1 2026 SAP Upgrade</div>
+    </div>
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-head"><div class="card-title">Execution Summary Table</div></div>
+      <div class="tbl-wrap"><table id="wkTable"></table></div>
+      <div style="padding:10px 18px 14px;font-size:11px;color:var(--dim)">
+        Exit criteria: 90–95% pass rate on core functions. 100% pass rate required for critical business processes. No showstopper defects outstanding.
+      </div>
+    </div>
+    <div class="mod-cards" id="modCards"></div>
+  </div>
+
+  <!-- ══ REPORTS ══ -->
+  <div id="page-reports" class="page">
+    <div class="page-head">
+      <div class="page-title">Reports &amp; Export</div>
+    </div>
+    <div class="export-row">
+      <button class="btn btn-primary" onclick="exportCSV()">⬇ Export Results CSV</button>
+      <button class="btn btn-primary" onclick="exportDefCSV()">⬇ Export Defects CSV</button>
+      <button class="btn btn-danger" onclick="resetAll()">↺ Reset All Data</button>
+    </div>
+    <div class="grid-2" style="margin-bottom:16px">
+      <div class="card" id="distCard"></div>
+      <div class="card" id="gonogoCard"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Recent Activity</div></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Test ID</th><th>Module</th><th>Description</th><th>Status</th><th>Updated By</th><th>Last Updated</th></tr></thead>
+          <tbody id="actTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- EDIT MODAL -->
+<div class="modal-bg hidden" id="editModal">
+  <div class="modal">
+    <h3>Edit Test Case — <span id="editId"></span></h3>
+    <div id="editCtx" style="padding:9px 12px;background:rgba(255,255,255,.05);border-radius:7px;font-size:11px;color:var(--dim);margin-bottom:16px;font-family:var(--font-mono)"></div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-control" id="editStatus">
+        <option>Not Started</option><option>In Progress</option>
+        <option>Pass</option><option>Fail</option><option>Blocked</option><option>Not In Scope</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Defect ID</label>
+      <input class="form-control" id="editDefect" placeholder="e.g. DEF-001">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Comments / Notes</label>
+      <textarea class="form-control" id="editComments" placeholder="Test observations…"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Responsible Tester</label>
+      <input class="form-control" id="editResponsible">
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('editModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- DEFECT MODAL -->
+<div class="modal-bg hidden" id="defectModal">
+  <div class="modal">
+    <h3 style="color:var(--red2)">🐛 Raise Defect</h3>
+    <div class="form-group">
+      <label class="form-label">Linked Test Case ID</label>
+      <input class="form-control" id="defTestId" placeholder="e.g. TC-0001 or WM-200">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Defect Title *</label>
+      <input class="form-control" id="defTitle" placeholder="Brief description of the issue">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Severity</label>
+      <select class="form-control" id="defSev">
+        <option>Critical</option><option>High</option><option selected>Medium</option><option>Low</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Assigned To</label>
+      <input class="form-control" id="defAssignee" placeholder="Person responsible for fix">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-control" id="defDesc" placeholder="Steps to reproduce, expected vs actual…"></textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('defectModal')">Cancel</button>
+      <button class="btn btn-danger" onclick="saveDefect()">Raise Defect</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// SEED DATA (from actual Excel test plan)
+// ════════════════════════════════════════════════════════════
+const SEED = [{"id":"TC-0001","module":"Sales & Distribution","stepNum":1,"highLevel":"O2C - Dropship","scenario":"Business Dropship order - channel 25","description":"Seeburger to push existing data to KIBO. Check the order in KIBO. Check the flow through Seeburger to SAP. See if the order and delivery gets created.","responsible":"Nick","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Critical"},{"id":"TC-0002","module":"Sales & Distribution","stepNum":1,"highLevel":"O2C - Dropship","scenario":"Business Dropship order - channel 25","description":"Change the order shipping route in KIBO from SDR to warehouse and see if the order gets updated with a new delivery group. Confirm Goods receipt and post.","responsible":"Nick","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Critical"},{"id":"TC-0003","module":"Sales & Distribution","stepNum":2,"highLevel":"O2C - ECom","scenario":"Ecom order - Channel 30","description":"Create an order through website. Check the order in KIBO. Check the flow through Seeburger to SAP. See if the order and delivery gets created to SDR.","responsible":"Nick","lead":"Artemis Antoniou","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Critical"},{"id":"TC-0004","module":"Sales & Distribution","stepNum":3,"highLevel":"O2C - marketplace","scenario":"Marketplace order - Channel 20","description":"Seeburger to push an existing data to KIBO. Check the order in KIBO. Check the flow through Seeburger to SAP. See if the order and delivery gets created.","responsible":"Nick","lead":"Artemis Antoniou","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0005","module":"Sales & Distribution","stepNum":4,"highLevel":"O2C - B2B","scenario":"Standard order","description":"Complete the full order to cash process in SAP.","responsible":"Artemis","lead":"Artemis Antoniou","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Critical"},{"id":"TC-0006","module":"Sales & Distribution","stepNum":5,"highLevel":"O2C - B2B","scenario":"Direct Import order (Third party Sales)","description":"Create a Direct Import order in SAP.","responsible":"Artemis","lead":"Artemis Antoniou","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0007","module":"Sales & Distribution","stepNum":5,"highLevel":"O2C - B2B","scenario":"Direct Import order (Third party Sales)","description":"Use the Purchase request generated and convert to a Purchase order.","responsible":"Alice","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0008","module":"Sales & Distribution","stepNum":5,"highLevel":"O2C - B2B","scenario":"Direct Import order (Third party Sales)","description":"Post Goods receipt against the PO.","responsible":"Issac","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0009","module":"Sales & Distribution","stepNum":5,"highLevel":"O2C - B2B","scenario":"Direct Import order (Third party Sales)","description":"Create a Pro-Forma Invoice.","responsible":"TBD","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0010","module":"Sales & Distribution","stepNum":5,"highLevel":"O2C - B2B","scenario":"Direct Import order (Third party Sales)","description":"Create an Invoice.","responsible":"TBD","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Critical"},{"id":"TC-0011","module":"Sales & Distribution","stepNum":6,"highLevel":"O2C - B2B","scenario":"Intercompany from US Plant","description":"Create an Intercompany sales order in SAP from US to CA.","responsible":"Artemis","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0012","module":"Sales & Distribution","stepNum":6,"highLevel":"O2C - B2B","scenario":"Intercompany from US Plant","description":"Create delivery in SAP and hand off to WM for Picking, Packing and Goods Issue.","responsible":"Pawan","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0013","module":"Sales & Distribution","stepNum":6,"highLevel":"O2C - B2B","scenario":"Intercompany from US Plant","description":"Create Outbound Delivery and Goods Issue.","responsible":"TBD","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0014","module":"Sales & Distribution","stepNum":6,"highLevel":"O2C - B2B","scenario":"Intercompany from US Plant","description":"Process Invoice.","responsible":"Alice","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0015","module":"Sales & Distribution","stepNum":7,"highLevel":"O2C - B2B","scenario":"Intercompany From DE Plant","description":"Create an Intercompany sales order in SAP from DE to CA.","responsible":"Artemis","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0016","module":"Sales & Distribution","stepNum":8,"highLevel":"O2C - B2B","scenario":"Rush Order","description":"Create a Rush order for an existing Customer.","responsible":"Artemis","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0017","module":"Sales & Distribution","stepNum":9,"highLevel":"O2C - B2B","scenario":"Credit Memo Request","description":"Create a Credit memo request. Process and post Credit note.","responsible":"Artemis","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0018","module":"Sales & Distribution","stepNum":10,"highLevel":"O2C - B2B","scenario":"Debit Memo Request","description":"Create a Debit memo request. Process and post Debit note.","responsible":"Artemis","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0019","module":"Sales & Distribution","stepNum":11,"highLevel":"O2C - B2B","scenario":"Return Order","description":"Create a Return Order, Post Goods receipt and process Credit Note.","responsible":"Artemis","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Critical"},{"id":"TC-0020","module":"Sales & Distribution","stepNum":12,"highLevel":"O2C - B2B","scenario":"Free of Charge order","description":"Create a Free of Charge order and process Goods Issue.","responsible":"Artemis","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0021","module":"Sales & Distribution","stepNum":13,"highLevel":"O2C - B2B","scenario":"Consignment Fill-Up","description":"Create a Consignment Fill-up order and process Goods Issue.","responsible":"Artemis","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0022","module":"Sales & Distribution","stepNum":14,"highLevel":"Pricing","scenario":"Update Pricing conditions","description":"Update the customer specific pricing conditions in SAP.","responsible":"Artemis","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0023","module":"Sales & Distribution","stepNum":15,"highLevel":"Condition Contract","scenario":"Update Condition Contract","description":"Update and settle a condition contract in SAP.","responsible":"Alice","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0024","module":"Sales & Distribution","stepNum":16,"highLevel":"Billing","scenario":"Billing Due List","description":"Run the billing due list and process invoices in a batch.","responsible":"Alice","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0025","module":"Sales & Distribution","stepNum":17,"highLevel":"Reporting","scenario":"Sales Reports","description":"Run key sales reports: open orders, deliveries, invoices.","responsible":"Artemis","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0026","module":"Sales & Distribution","stepNum":18,"highLevel":"Customer Master","scenario":"Customer Master Data","description":"Create/change customer master data including payment terms and credit limit.","responsible":"Artemis","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0027","module":"Sales & Distribution","stepNum":19,"highLevel":"Output","scenario":"Order Acknowledgement","description":"Verify order acknowledgement output is generated and sent correctly.","responsible":"Artemis","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0028","module":"Sales & Distribution","stepNum":20,"highLevel":"Output","scenario":"Delivery Note","description":"Verify delivery note output is generated correctly.","responsible":"Pawan","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0029","module":"Sales & Distribution","stepNum":21,"highLevel":"GTS","scenario":"Sanctioned Party List Check","description":"Verify the GTS sanctioned party list check is triggered on sales orders.","responsible":"Artemis","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0030","module":"Sales & Distribution","stepNum":22,"highLevel":"Credit Management","scenario":"Credit Check","description":"Verify credit check is triggered and credit block applied correctly.","responsible":"Artemis","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0031","module":"Sales & Distribution","stepNum":23,"highLevel":"Batch Management","scenario":"Batch Determination","description":"Verify batch determination works correctly on sales orders.","responsible":"Artemis","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0032","module":"Sales & Distribution","stepNum":24,"highLevel":"Serial Number","scenario":"Serial Number Management","description":"Verify serial number assignment on sales orders and deliveries.","responsible":"Pawan","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0033","module":"Sales & Distribution","stepNum":25,"highLevel":"Integration","scenario":"Seeburger Integration Test","description":"Verify Seeburger EDI messages are processed correctly end to end.","responsible":"Nick","lead":"Artemis Antoniou","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Critical"},{"id":"TC-0034","module":"Material Management","stepNum":1,"highLevel":"Procurement","scenario":"Intercompany US/DE to CA","description":"Purchase Info Records are created based on pricing condition in Sales.","responsible":"Kerry","lead":"Mark Periera","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0035","module":"Material Management","stepNum":1,"highLevel":"Procurement","scenario":"Intercompany US/DE to CA","description":"Create PO with Supplier 4900/2400, Receiving Plant CA, and do approval based on hierarchy.","responsible":"Kerry","lead":"Mark Periera","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0036","module":"Material Management","stepNum":1,"highLevel":"Procurement","scenario":"Intercompany US/DE to CA","description":"Verify PO output is ZINT.","responsible":"Kerry","lead":"Mark Periera","status":"Not Started","defectId":"","comments":"Done","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0037","module":"Material Management","stepNum":1,"highLevel":"Procurement","scenario":"Intercompany US/DE to CA","description":"Verify sales order created and order confirmation in PO.","responsible":"Artemis / Cristina ZW DE","lead":"Mark Periera","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0038","module":"Material Management","stepNum":2,"highLevel":"Procurement","scenario":"Import Order from Asia","description":"Create Import PO from Asia supplier for stock replenishment.","responsible":"Kerry","lead":"Mark Periera","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0039","module":"Material Management","stepNum":3,"highLevel":"Goods Receipt","scenario":"Goods Receipt against PO","description":"Post goods receipt against a purchase order and verify stock is updated.","responsible":"Kerry","lead":"Mark Periera","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Critical"},{"id":"TC-0040","module":"Material Management","stepNum":4,"highLevel":"Invoice Verification","scenario":"LIV - Logistics Invoice Verification","description":"Post vendor invoice against a PO using MIRO and verify 3-way match.","responsible":"Phil","lead":"Mark Periera","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Critical"},{"id":"TC-0041","module":"Material Management","stepNum":5,"highLevel":"Stock Transfer","scenario":"STO - Plant to Plant","description":"Create stock transfer order between plants and process goods movement.","responsible":"Kerry","lead":"Mark Periera","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0050","module":"Purchasing","stepNum":1,"highLevel":"P2P","scenario":"with cost center","description":"Check approval workflow: Create PR through My Twin using cost center, check approval flow, verify PR got created in SAP after approval.","responsible":"Suraj/Namarta","lead":"Suraj/Namarta","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0051","module":"Purchasing","stepNum":2,"highLevel":"P2P","scenario":"With Asset number","description":"Check approval workflow: Create PR through My Twin using asset number, check approval flow in My Twin, verify PR created in SAP.","responsible":"Suraj/Namarta","lead":"Suraj/Namarta","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0052","module":"Purchasing","stepNum":3,"highLevel":"P2P","scenario":"With internal order","description":"Check approval workflow: Create PR through My Twin using internal order, check approval flow in My Twin.","responsible":"Suraj/Namarta","lead":"Suraj/Namarta","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0053","module":"Purchasing","stepNum":4,"highLevel":"P2P","scenario":"Xsuite invoice load","description":"Work with finance to load an existing invoice for a supplier against the PO in Xsuite.","responsible":"Suraj/Phil","lead":"Suraj/Namarta","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0060","module":"Retail","stepNum":1,"highLevel":"FOC_STO","scenario":"Stock Transfer order","description":"Create Stock Transfer Order for Price category and a normal material.","responsible":"Kaitlyn","lead":"Kaitlyn","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0061","module":"Retail","stepNum":2,"highLevel":"FOC_STO","scenario":"Stock Transfer order","description":"Create Delivery.","responsible":"Kaitlyn/Jai/Pawan","lead":"Kaitlyn","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0062","module":"Retail","stepNum":3,"highLevel":"FOC_STO","scenario":"Stock Transfer order","description":"Receive STO in Fiori.","responsible":"Kaitlyn","lead":"Kaitlyn","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0063","module":"Retail","stepNum":4,"highLevel":"FOC_STO","scenario":"Stock Transfer order","description":"Check stock in MyPOS.","responsible":"Kaitlyn","lead":"Kaitlyn","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0064","module":"Retail","stepNum":5,"highLevel":"FOC_STO","scenario":"FOC Stock Transfer Order","description":"Create FOC Stock Transfer order - free goods material.","responsible":"Kaitlyn","lead":"Kaitlyn","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0065","module":"Retail","stepNum":6,"highLevel":"Retail Returns","scenario":"Return from store","description":"Process return from retail store back to warehouse.","responsible":"Kaitlyn","lead":"Kaitlyn","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0066","module":"Retail","stepNum":7,"highLevel":"Retail Sales","scenario":"POS Sales posting","description":"Verify POS sales are posted correctly through Seeburger interface.","responsible":"Kaitlyn","lead":"Kaitlyn","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Critical"},{"id":"TC-0070","module":"Accounts Payable","stepNum":1,"highLevel":"AP reporting","scenario":"Reports","description":"Reporting: Open Item list.","responsible":"Phil","lead":"Phil","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0071","module":"Accounts Payable","stepNum":1,"highLevel":"AP reporting","scenario":"Reports","description":"Line item Browser.","responsible":"Phil","lead":"Phil","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0072","module":"Accounts Payable","stepNum":1,"highLevel":"AP reporting","scenario":"Reports","description":"Display Supplier Balances.","responsible":"Phil","lead":"Phil","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0073","module":"Accounts Payable","stepNum":2,"highLevel":"AP Payment","scenario":"Payment Run","description":"Execute automatic payment run (F110) and verify payment proposal.","responsible":"Phil","lead":"Phil","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Critical"},{"id":"TC-0074","module":"Accounts Payable","stepNum":3,"highLevel":"AP Invoice","scenario":"Manual Invoice Entry","description":"Post manual vendor invoice using FB60 and verify posting.","responsible":"Phil","lead":"Phil","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0075","module":"Accounts Payable","stepNum":4,"highLevel":"Xsuite","scenario":"Xsuite Invoice Workflow","description":"Test Xsuite invoice workflow from receipt to posting in SAP.","responsible":"Phil","lead":"Phil","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0080","module":"Accounts Receivables","stepNum":1,"highLevel":"AR","scenario":"Customer Master","description":"Check / Display/change customer master data including credit management.","responsible":"Penny","lead":"Penny","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0081","module":"Accounts Receivables","stepNum":1,"highLevel":"AR","scenario":"Customer Master","description":"Open item list.","responsible":"Penny","lead":"Penny","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0082","module":"Accounts Receivables","stepNum":2,"highLevel":"AR","scenario":"Post Customer Invoice","description":"Post Customer Invoice using FB70.","responsible":"Gustavo","lead":"Penny","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Critical"},{"id":"TC-0083","module":"Accounts Receivables","stepNum":3,"highLevel":"AR","scenario":"Collections","description":"Process customer collections and incoming payments.","responsible":"Penny","lead":"Penny","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0084","module":"Accounts Receivables","stepNum":4,"highLevel":"AR","scenario":"Dunning","description":"Run dunning program and verify dunning letters are generated.","responsible":"Penny","lead":"Penny","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0090","module":"General Ledger","stepNum":1,"highLevel":"FI_GL","scenario":"GL Reports","description":"New GL line item browser.","responsible":"Gustavo","lead":"Alice/Gustavo","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0091","module":"General Ledger","stepNum":1,"highLevel":"FI_GL","scenario":"GL Reports","description":"Reporting: account balance and account items (view account / document with ledger view).","responsible":"Gustavo","lead":"Alice/Gustavo","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0092","module":"General Ledger","stepNum":1,"highLevel":"FI_GL","scenario":"GL Reports","description":"Reporting: Information system - GL account balances.","responsible":"Gustavo","lead":"Alice/Gustavo","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0093","module":"General Ledger","stepNum":1,"highLevel":"FI_GL","scenario":"GL Reports","description":"Reporting: Balance sheet structure.","responsible":"Gustavo","lead":"Alice/Gustavo","status":"Not In Scope","defectId":"","comments":"No authorized to use T.code FSE2","lastUpdated":"","updatedBy":"","priority":"Low"},{"id":"TC-0094","module":"General Ledger","stepNum":2,"highLevel":"FI_GL","scenario":"Journal Entry","description":"Post manual journal entry and verify posting.","responsible":"Alice","lead":"Alice/Gustavo","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Critical"},{"id":"TC-0100","module":"Controlling","stepNum":1,"highLevel":"Conditional Contract","scenario":"Condition Contract Mgmt","description":"Created new contract for IP bundle and volume rebate.","responsible":"Alice","lead":"Alice","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0101","module":"Controlling","stepNum":4,"highLevel":"output to Fiori","scenario":"download Trial Balance in Fiori","description":"Download Trial Balance in Fiori.","responsible":"Gustavo","lead":"Alice","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0102","module":"Controlling","stepNum":5,"highLevel":"Cost Center","scenario":"Cost Center Reporting","description":"Run cost center actual vs plan report and verify data.","responsible":"Alice","lead":"Alice","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0110","module":"SAP Administration","stepNum":1,"highLevel":"SAP Roles & Responsibilities","scenario":"Roles comparison","description":"Download roles & responsibility map from both Production and RISE test scenario and compare they are identical.","responsible":"Luie","lead":"Luie/John","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Critical"},{"id":"TC-0111","module":"SAP Administration","stepNum":2,"highLevel":"Warehouse Printer","scenario":"Printer setup","description":"Check and add user printer details in ZKQ cloud and ZKP after go live.","responsible":"John/Jiby","lead":"Luie/John","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0112","module":"SAP Administration","stepNum":3,"highLevel":"Sprint spooler test","scenario":"Spooler test","description":"Check if the print spooler is working pre and post go live.","responsible":"John","lead":"Luie/John","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0113","module":"SAP Administration","stepNum":4,"highLevel":"Fiori link update","scenario":"Fiori links","description":"Fiori link to be updated to every scanner gun for test environment and also after production roll out.","responsible":"John/Jiby","lead":"Luie/John","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0120","module":"Product Setup (PCM)","stepNum":1,"highLevel":"PCM","scenario":"Material Creation","description":"Create Material in PCM.","responsible":"Janine","lead":"Janine Maguire","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0121","module":"Product Setup (PCM)","stepNum":2,"highLevel":"PCM","scenario":"Material Creation","description":"Create Material in PCM - Daniella.","responsible":"Daniella","lead":"Janine Maguire","status":"Pass","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0122","module":"Product Setup (PCM)","stepNum":3,"highLevel":"MDM","scenario":"Listing Distribution Center","description":"Listing Distribution Center via WSM3.","responsible":"Kaitlyn","lead":"Janine Maguire","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"},{"id":"TC-0123","module":"Product Setup (PCM)","stepNum":4,"highLevel":"MDM","scenario":"Enrichment","description":"Check, Enrichment and Start via ARTMAS.","responsible":"Janine","lead":"Janine Maguire","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"Medium"},{"id":"TC-0124","module":"Product Setup (PCM)","stepNum":5,"highLevel":"PCM","scenario":"Material Change","description":"Update existing material attributes in PCM and verify sync to SAP.","responsible":"Janine","lead":"Janine Maguire","status":"Not Started","defectId":"","comments":"","lastUpdated":"","updatedBy":"","priority":"High"}];
+
+// Add first 50 WM records condensed
+const WM_SEED = [
+  ["WM-200","Outbound - SDR (2-step Picking)","Navigate to the Outbound Delivery Monitor Screen","Jai","Not Started"],
+  ["WM-201","Outbound - SDR (2-step Picking)","Initial Screen: Deliveries to group and activate 2-Step Picking","Pawan","Not Started"],
+  ["WM-202","Outbound - SDR (2-step Picking)","Create TO For Wave Pick Group","Pawan","Not Started"],
+  ["WM-203","Outbound - SDR (2-step Picking)","On Initial Screen - Create TO","Pawan","Not Started"],
+  ["WM-204","Outbound - SDR (2-step Picking)","Print Consolidated Picklist (Optional)","Pawan","Not Started"],
+  ["WM-205","Outbound - SDR (2-step Picking)","Manual Assignment of TO in Flexus LES Cockpit","Pawan","Not Started"],
+  ["WM-206","Outbound - SDR (2-step Picking)","Create Group for TO in LES cockpit","Pawan","Not Started"],
+  ["WM-207","Outbound - SDR (2-step Picking)","Assign Worker in Flexus LES Cockpit","Pawan","Not Started"],
+  ["WM-208","Outbound - SDR (2-step Picking)","Navigate Fiori - Assign Configuration group (one time)","Pawan","Not Started"],
+  ["WM-209","Outbound - SDR (2-step Picking)","Navigate to Good Issue Work List Tile in Fiori","Pawan","Not Started"],
+  ["WM-210","Outbound - SDR (2-step Picking)","Initial screen - Confirm TO","Pawan","Not Started"],
+  ["WM-211","Outbound - SDR (2-step Picking)","Flexus Background Program - Create TO for 2nd step","Pawan","Not Started"],
+  ["WM-212","Outbound - SDR (2-step Picking)","Assign Worker in LES Cockpit for 2nd step TOs","Pawan","Not Started"],
+  ["WM-213","Outbound - SDR (2-step Picking)","Navigate to Good Issue Worklist in Fiori","Pawan","Not Started"],
+  ["WM-214","Outbound - SDR (2-step Picking)","Initial Fiori Screen - Confirm and POST","Pawan","Not Started"],
+  ["WM-215","Outbound - SDR (2-step Picking)","Packing Table - Print Shipping Labels","Pawan","Not Started"],
+  ["WM-216","Outbound - SDR (2-step Picking)","Mass PGI e-commerce batches","Pawan","Not Started"],
+  ["WM-217","Outbound - SDR (2-step Picking)","Carton label verification for Home Hardware","Pawan","Not Started"],
+  ["WM-340","Outbound Delivery Steps","Confirm TO - Warehouse Packing","Pawan","Not Started"],
+  ["WM-341","Outbound Delivery Steps","Perform Post Goods Issue","Pawan","Not Started"],
+  ["WM-342","Scrapping","Scrapping - identify Material, Batch, Quantity","Pawan","Not Started"],
+  ["WM-343","Scrapping","Identify Materials and bin location in warehouse","Pawan","Not Started"],
+  ["WM-344","Scrapping","Goods Issue via MIGO Movement Type 551","Pawan","Not Started"],
+  ["WM-345","Scrapping","Auto TO Creation via RLAUTA10","Pawan","Not Started"],
+  ["WM-346","Scrapping","Flexus Cockpit - process scrap","Pawan","Not Started"],
+  ["WM-347","Scrapping","Navigate to Good Issue Worklist Tile","Pawan","Not Started"],
+  ["WM-348","Scrapping","Confirm TO - Stock moved to 999 Scrap Location","Pawan","Not Started"],
+  ["WM-349","Scrapping","Check Stock in 999 Scrap Location via LS24","Pawan","Pass"],
+  ["WM-350","Scrapping","Look at Posting Document via MB51","Pawan","Not Started"],
+  ["WM-351","Replenishment","Replenishment process initiation","Pawan","Not Started"],
+  ["WM-352","Replenishment","Display Replenishment Settings via MM43","Pawan","Pass"],
+  ["WM-353","Replenishment","Replenishment for Fixed Bins via LP21","Pawan","Pass"],
+  ["WM-354","Replenishment","Create Picking request","Pawan","Pass"],
+  ["WM-355","Replenishment","Display Transfer Requirement via LB10","Pawan","Pass"],
+  ["WM-356","Replenishment","Create TO from TR","Pawan","Pass"],
+  ["WM-357","Replenishment","Manual Assignment of TO in Flexus LES Cockpit","Pawan","Pass"],
+  ["WM-358","Replenishment","Assign Worker in LES Cockpit","Pawan","Pass"],
+  ["WM-359","Replenishment","Navigate Fiori - Assign Configuration group","Pawan","Pass"],
+  ["WM-360","Replenishment","Confirm Putaway","Pawan","Pass"],
+  ["WM-361","Physical Inventory WM","Check Stock in Warehouse Bin via LX03","Pawan","Pass"],
+  ["WM-362","Physical Inventory WM","View Stock in bin via LS24","Pawan","Pass"],
+  ["WM-363","Physical Inventory WM","Create System Inventory Record","Pawan","Not Started"],
+  ["WM-364","Physical Inventory WM","Change System Inventory Record via LI02N","Pawan","Pass"],
+  ["WM-365","Physical Inventory WM","WM Physical Inventory Tile in Fiori","Pawan","Not Started"],
+  ["WM-366","Physical Inventory WM","Enter count in WM Physical Inventory Tile","Pawan","Pass"],
+  ["WM-367","Physical Inventory WM","Go to Flexus Inventory Monitor","Pawan","Pass"],
+  ["WM-368","Physical Inventory WM","Clear WM Differences via LI20","Pawan","Pass"],
+  ["WM-369","Physical Inventory WM","Clear WM Differences - enter Inventory Document","Pawan","Pass"],
+  ["WM-370","Physical Inventory WM","Write Off cleared bin items","Pawan","Pass"],
+  ["WM-371","Physical Inventory WM","View Stock after write-off via LS24","Pawan","Pass"],
+  ["WM-372","Physical Inventory WM","Clear IM Differences via LI21","Pawan","Pass"],
+  ["WM-373","Physical Inventory WM","Clear IM Differences - select Write Off","Pawan","Pass"],
+  ["WM-374","WH Sales Count","Check Stock in Warehouse Bin","Pawan","Pass"],
+  ["WM-375","WH Sales Count","View Stock in bin","Pawan","Pass"],
+  ["WM-376","WH Sales Count","Create System Inventory Record","Pawan","Pass"],
+  ["WM-377","WH Sales Count","Change System Inventory Record","Pawan","Pass"],
+  ["WM-378","WH Sales Count","WM Physical Inventory Tile upload","Pawan","Pass"],
+  ["WM-379","WH Sales Count","Generate inventory document via MI39","Pawan","Pass"],
+  ["WM-380","WH Sales Count","Post differences via MI20","Pawan","Pass"],
+  ["WM-381","WH Sales Count","Clear WM Differences","Pawan","Not Started"],
+  ["WM-382","WH Sales Count","Clear WM Differences step 2","Pawan","Not Started"],
+  ["WM-399","Transfer of Stock","Initial Entry via LT01","Pawan","Not Started"],
+  ["WM-400","Transfer of Stock","Generate Transfer Order Item","Pawan","Not Started"],
+  ["WM-401","Transfer of Stock","Movement Data entry","Pawan","Not Started"],
+  ["WM-402","Transfer of Stock","Confirm Transfer Details","Pawan","Not Started"],
+  ["WM-403","Transfer of Stock","Confirm Transfer Order via LT12","Pawan","Not Started"],
+  ["WM-404","Transfer of Stock","Check Stock of Material via LS24","Pawan","Not Started"],
+  ["WM-405","Block/Unblock (8221)","Identify item to transfer","Pawan","Not Started"],
+  ["WM-406","Block/Unblock (8221)","Initial Entry via Returns app","Pawan","Not Started"],
+  ["WM-407","Block/Unblock (8221)","Check bin status via LS24","Pawan","Not Started"],
+  ["WM-413","Cancel Transfer Order","Initial Entry via LT15","Pawan","Not Started"],
+  ["WM-414","Cancel Transfer Order","Tick box to cancel line items","Pawan","Not Started"],
+  ["WM-415","Cancel Transfer Order","Check TO was cancelled via LT24","Pawan","Not Started"],
+  ["WM-423","Warehouse Monitor","Warehouse Activity Monitor via LL01","Pawan","Not Started"],
+  ["WM-424","Warehouse Monitor","Overview of all critical objects","Pawan","Not Started"],
+  ["WM-425","Cancel Delivery GR/GI","Reverse Goods Movement via VL09","Pawan","Not Started"],
+  ["WM-426","Cancel Delivery GR/GI","Stock Per Material verification via LS24","Pawan","Not Started"],
+  ["WM-427","Returns Processing","Post Goods receipt via Returns app","Pawan","Not Started"],
+  ["WM-428","Returns Processing","Complete inspection","Pawan","Not Started"],
+  ["WM-429","Returns Processing","Putaway A grade items","Pawan","Not Started"],
+];
+
+const wmEntries = WM_SEED.map(([id,scenario,description,responsible,status],i) => ({
+  id, module:"Warehouse Management", stepNum: i+1, highLevel: scenario,
+  scenario, description, responsible, lead:"Jai Vishwa / Pawan",
+  status, defectId:"", comments:"", lastUpdated:"", updatedBy:"", priority:"High"
+}));
+
+const ALL_SEED = [...SEED, ...wmEntries];
+
+// ════════════════════════════════════════════════════════════
+// CONSTANTS
+// ════════════════════════════════════════════════════════════
+const MOD_INFO = {
+  'Sales & Distribution': {cls:'m-sd',  hex:'#60a5fa', lead:'Artemis Antoniou'},
+  'Material Management':  {cls:'m-mm',  hex:'#5de3a8', lead:'Mark Periera'},
+  'Purchasing':           {cls:'m-pur', hex:'#c084fc', lead:'Suraj/Namarta'},
+  'Retail':               {cls:'m-ret', hex:'#f4a261', lead:'Kaitlyn'},
+  'Accounts Payable':     {cls:'m-ap',  hex:'#ff6b74', lead:'Phil'},
+  'Accounts Receivables': {cls:'m-ar',  hex:'#f472b6', lead:'Penny'},
+  'General Ledger':       {cls:'m-gl',  hex:'#34d399', lead:'Alice/Gustavo'},
+  'Controlling':          {cls:'m-co',  hex:'#2ec4b6', lead:'Alice'},
+  'SAP Administration':   {cls:'m-sa',  hex:'#fb923c', lead:'Luie/John'},
+  'Product Setup (PCM)':  {cls:'m-pcm', hex:'#818cf8', lead:'Janine Maguire'},
+  'Warehouse Management': {cls:'m-wm',  hex:'#4ade80', lead:'Jai Vishwa / Pawan'},
+};
+
+const BADGE_CLS = {
+  'Pass':'b-pass','Fail':'b-fail','In Progress':'b-prog',
+  'Not Started':'b-none','Blocked':'b-block','Not In Scope':'b-scope'
+};
+
+const BORDER_CLR = {
+  'Pass':'var(--green)','Fail':'var(--red)','In Progress':'var(--blue)',
+  'Blocked':'var(--amber)','Not Started':'rgba(255,255,255,.12)','Not In Scope':'rgba(123,94,167,.5)'
+};
+
+const PRI_CLR = {'Critical':'var(--red2)','High':'var(--amber)','Medium':'var(--blue)'};
+
+const SHEETS_API = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+const LS_T = 'sap_uat_T_v4';
+const LS_D = 'sap_uat_D_v4';
+const LS_N = 'sap_uat_N_v4';
+
+// ════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════
+let tests, defects;
+try { tests = JSON.parse(localStorage.getItem(LS_T)) || null; } catch(e){}
+try { defects = JSON.parse(localStorage.getItem(LS_D)) || null; } catch(e){}
+if (!tests) tests = ALL_SEED.map(t=>({...t}));
+if (!defects) defects = [];
+
+let editingId = null, scenFilt = '';
+function saveT() { try{localStorage.setItem(LS_T,JSON.stringify(tests));}catch(e){} }
+function saveD() { try{localStorage.setItem(LS_D,JSON.stringify(defects));}catch(e){} }
+
+// ════════════════════════════════════════════════════════════
+// COMPUTED
+// ════════════════════════════════════════════════════════════
+function stats() {
+  const total=tests.length;
+  const s={};
+  ['Pass','Fail','In Progress','Not Started','Blocked','Not In Scope'].forEach(x=>s[x]=0);
+  tests.forEach(t=>s[t.status]=(s[t.status]||0)+1);
+  const exec=s.Pass+s.Fail+s.Blocked;
+  const execRate=total>0?Math.round(exec/total*100):0;
+  const passRate=exec>0?Math.round(s.Pass/exec*100):0;
+  const failRate=exec>0?Math.round(s.Fail/exec*100):0;
+  return{total,s,exec,execRate,passRate,failRate};
+}
+
+function modStats() {
+  return Object.fromEntries(Object.keys(MOD_INFO).map(m=>{
+    const mt=tests.filter(t=>t.module===m);
+    const pass=mt.filter(t=>t.status==='Pass').length;
+    const fail=mt.filter(t=>t.status==='Fail').length;
+    const blk=mt.filter(t=>t.status==='Blocked').length;
+    const exec=pass+fail+blk;
+    return[m,{total:mt.length,pass,fail,blk,exec,
+      passRate:exec>0?Math.round(pass/exec*100):0,
+      execRate:mt.length>0?Math.round(exec/mt.length*100):0}];
+  }));
+}
+
+function rateColor(r) {
+  if(r>=90) return {bg:'var(--greenbg)',cl:'var(--green)',bd:'rgba(45,206,137,.3)'};
+  if(r>=70) return {bg:'var(--amberbg)',cl:'var(--amber)',bd:'rgba(244,162,97,.3)'};
+  return {bg:'var(--redbg)',cl:'var(--red2)',bd:'rgba(230,57,70,.3)'};
+}
+
+// ════════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════════
+const tester = ()=>document.getElementById('testerName').value.trim();
+const now = ()=>new Date().toLocaleString('en-CA',{hour12:false});
+
+function toast(msg,type='ok'){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='toast show '+type;
+  setTimeout(()=>el.className='toast',3000);
+}
+
+function badge(status){
+  return `<span class="badge ${BADGE_CLS[status]||'b-none'}">${status}</span>`;
+}
+function modPill(m){
+  const mi=MOD_INFO[m]||{cls:'m-sd'};
+  return `<span class="mod-pill ${mi.cls}">${m}</span>`;
+}
+
+// ════════════════════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════════════════════
+function showTab(id, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  const R = {dashboard:renderDash, execute:()=>{populateFilt();renderScenPills();renderTcList();},
+    defects:renderDefects, weekly:renderWeekly, reports:renderReports};
+  if(R[id]) R[id]();
+}
+
+// ════════════════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════════════════
+function renderDash(){
+  const st=stats(), ms=modStats();
+
+  const kpis=[
+    {icon:'📋',val:st.total,label:'Total TCs',al:'var(--accent)',line:'var(--accent)'},
+    {icon:'▶',val:st.exec,label:'Executed',al:'var(--ghost)',line:'rgba(255,255,255,.25)'},
+    {icon:'✅',val:st.s.Pass,label:'Passed',al:'var(--green)',line:'var(--green)'},
+    {icon:'❌',val:st.s.Fail,label:'Failed',al:'var(--red2)',line:'var(--red)'},
+    {icon:'⛔',val:st.s.Blocked,label:'Blocked',al:'var(--amber)',line:'var(--amber)'},
+    {icon:'🎯',val:st.passRate+'%',label:'Pass Rate',al:st.passRate>=90?'var(--green)':st.passRate>=70?'var(--amber)':'var(--red2)',line:st.passRate>=90?'var(--green)':'var(--red)'},
+    {icon:'📊',val:st.execRate+'%',label:'Exec Rate',al:'var(--blue)',line:'var(--blue)'},
+    {icon:'🐛',val:defects.filter(d=>d.status==='Open').length,label:'Open Defects',al:'var(--red2)',line:'var(--red)'},
+  ];
+
+  document.getElementById('kpiStrip').innerHTML = kpis.map(k=>
+    `<div class="kpi-card" style="--accent-line:${k.line}">
+      <div class="kpi-icon">${k.icon}</div>
+      <div class="kpi-val" style="color:${k.al}">${k.val}</div>
+      <div class="kpi-label">${k.label}</div>
+    </div>`).join('');
+
+  document.getElementById('execProgLabel').textContent=`${st.exec} of ${st.total} test cases executed`;
+  document.getElementById('execRateLbl').textContent=st.execRate+'%';
+  document.getElementById('mainBar').style.width=st.execRate+'%';
+  document.getElementById('legendRow').innerHTML=
+    ['Pass','Fail','Blocked','In Progress','Not Started','Not In Scope'].map(s=>
+      `<span class="badge ${BADGE_CLS[s]}">${s} <strong style="font-size:11px">${st.s[s]}</strong></span>`
+    ).join('');
+
+  document.getElementById('modTbody').innerHTML=Object.entries(ms).map(([m,d])=>{
+    const mi=MOD_INFO[m]||{hex:'#4895ef',cls:'m-sd'};
+    const rc=rateColor(d.passRate);
+    return `<tr>
+      <td><span style="color:${mi.hex};font-weight:700;margin-right:6px">●</span>${m}</td>
+      <td style="color:var(--dim);font-size:11px;font-family:var(--font-mono)">${mi.lead}</td>
+      <td style="text-align:center;font-family:var(--font-mono);font-weight:700;color:var(--fog)">${d.total}</td>
+      <td style="text-align:center;font-family:var(--font-mono)">${d.exec}</td>
+      <td style="text-align:center;font-family:var(--font-mono);color:var(--green);font-weight:700">${d.pass}</td>
+      <td style="text-align:center;font-family:var(--font-mono);color:var(--red2);font-weight:700">${d.fail}</td>
+      <td style="text-align:center;font-family:var(--font-mono);color:var(--amber)">${d.blk}</td>
+      <td style="text-align:center">
+        <span class="rate-chip" style="background:${rc.bg};color:${rc.cl};border:1px solid ${rc.bd}">${d.passRate}%</span>
+      </td>
+      <td style="min-width:120px">
+        <div class="bar-track" style="height:6px"><div class="bar-fill" style="width:${d.execRate}%;background:${mi.hex}"></div></div>
+        <div style="font-size:9px;color:var(--dim);text-align:right;margin-top:2px;font-family:var(--font-mono)">${d.execRate}%</div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+// EXECUTE TESTS
+// ════════════════════════════════════════════════════════════
+function populateFilt(){
+  const sel=document.getElementById('modFilt');
+  if(sel.options.length>1) return;
+  [...new Set(tests.map(t=>t.module))].sort().forEach(m=>{
+    const o=document.createElement('option'); o.value=m; o.textContent=m; sel.appendChild(o);
+  });
+}
+
+function renderScenPills(){
+  const mod=document.getElementById('modFilt').value;
+  const all=[...new Set(tests.filter(t=>!mod||t.module===mod).map(t=>t.scenario))].sort();
+  if(all.length<=1){ document.getElementById('scenPills').innerHTML=''; return; }
+  document.getElementById('scenPills').innerHTML=
+    `<button class="s-pill${!scenFilt?' on':''}" onclick="setSc('')">All</button>`+
+    all.map(s=>`<button class="s-pill${scenFilt===s?' on':''}" onclick="setSc(decodeURIComponent('${encodeURIComponent(s)}'))">${s}</button>`).join('');
+}
+function setSc(s){scenFilt=s;renderScenPills();renderTcList();}
+
+function renderTcList(){
+  const q=(document.getElementById('searchQ').value||'').toLowerCase();
+  const mod=document.getElementById('modFilt').value;
+  const stat=document.getElementById('statFilt').value;
+  const pri=document.getElementById('priFilt').value;
+
+  const filt=tests.filter(t=>{
+    if(mod&&t.module!==mod) return false;
+    if(stat&&t.status!==stat) return false;
+    if(pri&&t.priority!==pri) return false;
+    if(scenFilt&&t.scenario!==scenFilt) return false;
+    if(q&&![t.id,t.description,t.scenario,t.responsible,t.highLevel,t.module].some(f=>f&&f.toLowerCase().includes(q))) return false;
+    return true;
+  });
+
+  document.getElementById('tcCount').textContent=filt.length+' test cases';
+  document.getElementById('tcList').innerHTML=filt.map(t=>{
+    const mi=MOD_INFO[t.module]||{cls:'m-sd',hex:'#4895ef'};
+    const bc=BORDER_CLR[t.status]||'rgba(255,255,255,.12)';
+    const pc=PRI_CLR[t.priority||'Medium']||'var(--blue)';
+    return `<div class="tc-row" style="border-left-color:${bc}">
+      <div class="tc-id-box">
+        <div class="tc-id-code">${t.id}</div>
+        ${badge(t.status)}
+        ${t.priority?`<div style="margin-top:5px;font-family:var(--font-mono);font-size:9px;color:${pc}">${t.priority}</div>`:''}
+      </div>
+      <div class="tc-body">
+        <div class="tc-tags">
+          <span class="mod-pill ${mi.cls}">${t.module}</span>
+          <span class="tc-step-label">Step ${t.stepNum} · ${t.highLevel}</span>
+        </div>
+        <div style="font-size:10px;color:var(--dim);margin-bottom:4px;font-family:var(--font-mono)">📋 ${t.scenario}</div>
+        <div class="tc-desc">${t.description.substring(0,140)}${t.description.length>140?'…':''}</div>
+        <div class="tc-meta">
+          <span>👤 ${t.responsible}</span>
+          ${t.defectId?`<span style="color:var(--red2)">🐛 ${t.defectId}</span>`:''}
+          ${t.lastUpdated?`<span>🕐 ${t.lastUpdated} · ${t.updatedBy}</span>`:''}
+          ${t.comments?`<span style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💬 ${t.comments.substring(0,50)}</span>`:''}
+        </div>
+      </div>
+      <div class="tc-actions">
+        <div class="action-row">
+          <button class="btn btn-pass btn-sm" onclick="qStatus('${t.id}','Pass')">✅ Pass</button>
+          <button class="btn btn-fail btn-sm" onclick="openDefectModal('${t.id}')">❌ Fail</button>
+          <button class="btn btn-prog btn-sm" onclick="qStatus('${t.id}','In Progress')">▶ WIP</button>
+          <button class="btn btn-block btn-sm" onclick="qStatus('${t.id}','Blocked')">⛔</button>
+        </div>
+        <button class="btn btn-edit btn-sm" onclick="openEdit('${t.id}')">✏ Edit Details</button>
+      </div>
+    </div>`;
+  }).join('')||`<div style="text-align:center;padding:60px;color:var(--dim)">No test cases match your filters</div>`;
+}
+
+function qStatus(id,status){
+  if(!tester()){toast('Enter your name first (top right)','err');return;}
+  const t=tests.find(x=>x.id===id); if(!t) return;
+  t.status=status; t.lastUpdated=now(); t.updatedBy=tester();
+  saveT(); renderTcList(); renderDash(); toast(id+' → '+status);
+}
+
+// ════════════════════════════════════════════════════════════
+// EDIT MODAL
+// ════════════════════════════════════════════════════════════
+function openEdit(id){
+  editingId=id;
+  const t=tests.find(x=>x.id===id);
+  document.getElementById('editId').textContent=id;
+  document.getElementById('editCtx').textContent=`${t.module} · Step ${t.stepNum} · ${t.scenario}`;
+  document.getElementById('editStatus').value=t.status;
+  document.getElementById('editDefect').value=t.defectId||'';
+  document.getElementById('editComments').value=t.comments||'';
+  document.getElementById('editResponsible').value=t.responsible||'';
+  document.getElementById('editModal').classList.remove('hidden');
+}
+function saveEdit(){
+  if(!tester()){toast('Enter your name first','err');return;}
+  const t=tests.find(x=>x.id===editingId);
+  t.status=document.getElementById('editStatus').value;
+  t.defectId=document.getElementById('editDefect').value;
+  t.comments=document.getElementById('editComments').value;
+  t.responsible=document.getElementById('editResponsible').value;
+  t.lastUpdated=now(); t.updatedBy=tester();
+  saveT(); closeModal('editModal'); renderTcList(); toast(editingId+' updated');
+}
+
+// ════════════════════════════════════════════════════════════
+// DEFECTS
+// ════════════════════════════════════════════════════════════
+function openDefectModal(testId){
+  ['defTestId','defTitle','defAssignee','defDesc'].forEach(id=>document.getElementById(id).value=id==='defTestId'?testId:'');
+  document.getElementById('defSev').value='Medium';
+  document.getElementById('defectModal').classList.remove('hidden');
+}
+function saveDefect(){
+  const title=document.getElementById('defTitle').value.trim();
+  if(!title){toast('Enter a defect title','err');return;}
+  const testId=document.getElementById('defTestId').value.trim();
+  const id='DEF-'+String(defects.length+1).padStart(3,'0');
+  defects.push({id,testId,title,severity:document.getElementById('defSev').value,
+    assignee:document.getElementById('defAssignee').value,
+    description:document.getElementById('defDesc').value,
+    status:'Open',raisedBy:tester()||'Unknown',raisedAt:now()});
+  saveD();
+  if(testId){const t=tests.find(x=>x.id===testId);if(t){t.status='Fail';t.defectId=id;t.lastUpdated=now();t.updatedBy=tester()||'Unknown';saveT();}}
+  closeModal('defectModal'); renderDefects(); toast(id+' raised');
+}
+
+function renderDefects(){
+  const groups=[{s:'Open',c:'var(--red2)'},{s:'In Progress',c:'var(--amber)'},{s:'Resolved',c:'var(--green)'},{s:'Closed',c:'var(--dim)'}];
+  document.getElementById('defStatGrid').innerHTML=groups.map(g=>{
+    const cnt=defects.filter(d=>d.status===g.s).length;
+    return`<div class="def-stat" style="border-top-color:${g.c}">
+      <div class="def-stat-num" style="color:${g.c}">${cnt}</div>
+      <div class="def-stat-lbl">${g.s}</div>
+    </div>`;
+  }).join('');
+  const sc={Critical:'var(--red2)',High:'var(--amber)',Medium:'var(--blue)',Low:'var(--dim)'};
+  document.getElementById('defTbody').innerHTML=defects.length===0
+    ?'<tr><td colspan="9" style="text-align:center;color:var(--dim);padding:50px">No defects raised yet 🎉</td></tr>'
+    :defects.map(d=>`<tr>
+      <td style="font-family:var(--font-mono);font-weight:700;color:var(--red2)">${d.id}</td>
+      <td style="font-family:var(--font-mono);color:var(--blue)">${d.testId||'—'}</td>
+      <td>${d.title}</td>
+      <td><span style="color:${sc[d.severity]};font-weight:700;font-family:var(--font-mono);font-size:10px">${d.severity}</span></td>
+      <td><select onchange="updDef('${d.id}',this.value)" style="background:var(--ink3);border:1px solid rgba(255,255,255,.12);color:var(--fog);padding:4px 8px;border-radius:5px;font-size:11px;font-family:var(--font-body);outline:none;">
+        ${['Open','In Progress','Resolved','Closed',"Won't Fix"].map(s=>`<option ${d.status===s?'selected':''}>${s}</option>`).join('')}
+      </select></td>
+      <td style="font-size:11px">${d.raisedBy}</td>
+      <td style="font-size:11px">${d.assignee||'—'}</td>
+      <td style="font-size:10px;color:var(--dim);font-family:var(--font-mono)">${d.raisedAt}</td>
+      <td><button class="btn btn-fail btn-sm" onclick="delDef('${d.id}')">Del</button></td>
+    </tr>`).join('');
+}
+function updDef(id,status){const d=defects.find(x=>x.id===id);if(d){d.status=status;saveD();renderDefects();toast(id+' → '+status);}}
+function delDef(id){if(!confirm('Delete '+id+'?'))return;defects=defects.filter(x=>x.id!==id);saveD();renderDefects();toast(id+' deleted');}
+
+// ════════════════════════════════════════════════════════════
+// WEEKLY
+// ════════════════════════════════════════════════════════════
+function renderWeekly(){
+  const st=stats(), ms=modStats();
+  const WEEKS=['Wk Mar 19','Wk Mar 22','Wk Mar 29','Wk Apr 5','Wk Apr 12'];
+  const rows=[
+    {n:1,label:'Total Test Cases',fn:()=>st.total,rate:false},
+    {n:2,label:'Total Executed',fn:()=>st.exec,rate:false},
+    {n:3,label:'No Defect (Pass)',fn:()=>st.s.Pass,rate:false},
+    {n:4,label:'Defect (Fail)',fn:()=>st.s.Fail,rate:false},
+    {n:5,label:'Blocked',fn:()=>st.s.Blocked,rate:false},
+    {n:6,label:'Pass Rate',fn:()=>st.passRate+'%',rate:true,good:st.passRate>=90},
+    {n:7,label:'Fail Rate',fn:()=>st.failRate+'%',rate:true,good:st.failRate<=5},
+    {n:8,label:'Execution Rate',fn:()=>st.execRate+'%',rate:true,good:st.execRate>=80},
+  ];
+  document.getElementById('wkTable').innerHTML=
+    `<thead><tr>
+      <th style="width:36px">#</th><th>Metric</th>
+      ${WEEKS.map(w=>`<th style="text-align:center">${w}</th>`).join('')}
+    </tr></thead><tbody>${rows.map(r=>{
+      const val=r.fn();
+      const cell=r.rate
+        ?`<span class="rate-chip" style="background:${r.good?'var(--greenbg)':'var(--redbg)'};color:${r.good?'var(--green)':'var(--red2)'};border:1px solid ${r.good?'rgba(45,206,137,.3)':'rgba(230,57,70,.3)'}">${val}</span>`
+        :`<strong style="font-family:var(--font-mono);color:var(--fog)">${val}</strong>`;
+      return`<tr>
+        <td style="color:var(--dim);font-family:var(--font-mono);font-size:11px">${r.n}</td>
+        <td style="font-weight:600;color:var(--fog)">${r.label}</td>
+        ${WEEKS.map(()=>`<td style="text-align:center">${cell}</td>`).join('')}
+      </tr>`;
+    }).join('')}</tbody>`;
+
+  document.getElementById('modCards').innerHTML=Object.entries(ms).map(([m,d])=>{
+    const mi=MOD_INFO[m]||{hex:'#4895ef',cls:'m-sd',lead:'TBD'};
+    const rc=rateColor(d.passRate);
+    return`<div class="mod-card" style="border-top-color:${mi.hex}">
+      <div style="font-weight:700;color:${mi.hex};font-size:12px;margin-bottom:3px">${m}</div>
+      <div style="font-size:10px;color:var(--dim);font-family:var(--font-mono);margin-bottom:12px">Lead: ${mi.lead}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:12px;margin-bottom:12px">
+        <div>Total: <strong style="font-family:var(--font-mono);color:var(--fog)">${d.total}</strong></div>
+        <div>Exec: <strong style="font-family:var(--font-mono);color:var(--fog)">${d.exec}</strong></div>
+        <div>Pass: <strong style="font-family:var(--font-mono);color:var(--green)">${d.pass}</strong></div>
+        <div>Fail: <strong style="font-family:var(--font-mono);color:var(--red2)">${d.fail}</strong></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px">
+        <span style="color:var(--dim)">Pass Rate</span>
+        <span class="rate-chip" style="background:${rc.bg};color:${rc.cl};border:1px solid ${rc.bd}">${d.passRate}%</span>
+      </div>
+      <div class="bar-track" style="height:5px"><div class="bar-fill" style="width:${d.execRate}%;background:${mi.hex}"></div></div>
+      <div style="text-align:right;font-size:9px;color:var(--dim);margin-top:3px;font-family:var(--font-mono)">${d.execRate}% executed</div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+// REPORTS
+// ════════════════════════════════════════════════════════════
+function renderReports(){
+  const st=stats();
+  const openCrit=defects.filter(d=>d.severity==='Critical'&&d.status==='Open').length;
+  const openAll=defects.filter(d=>d.status==='Open').length;
+
+  document.getElementById('distCard').innerHTML=
+    `<div class="card-head"><div class="card-title">Status Distribution</div></div>
+    <div class="card-body">${['Pass','Fail','In Progress','Not Started','Blocked','Not In Scope'].map(s=>{
+      const cnt=st.s[s]||0;
+      const pct=st.total>0?Math.round(cnt/st.total*100):0;
+      return`<div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+          ${badge(s)}
+          <span style="font-family:var(--font-mono);color:var(--dim)">${cnt} (${pct}%)</span>
+        </div>
+        <div class="bar-track" style="height:7px">
+          <div class="bar-fill" style="width:${pct}%;background:var(--accent)"></div>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+
+  const readiness=[
+    {l:'Pass Rate ≥ 90%',   met:st.passRate>=90, val:st.passRate+'%',  t:'≥ 90%'},
+    {l:'Execution ≥ 95%',   met:st.execRate>=95, val:st.execRate+'%',  t:'≥ 95%'},
+    {l:'Fail Rate ≤ 5%',    met:st.failRate<=5,  val:st.failRate+'%',  t:'≤ 5%'},
+    {l:'No Critical Defects',met:openCrit===0,   val:openCrit+' open', t:'0'},
+    {l:'No Open Defects',   met:openAll===0,     val:openAll+' open',  t:'0'},
+  ];
+  const goGo=readiness.every(r=>r.met);
+  document.getElementById('gonogoCard').innerHTML=
+    `<div class="card-head"><div class="card-title">Go / No-Go Readiness</div></div>
+    <div class="card-body">
+      ${readiness.map(r=>`<div class="readiness-row">
+        <div class="rr-icon">${r.met?'✅':'⚠️'}</div>
+        <div class="rr-info">
+          <div class="rr-label">${r.l}</div>
+          <div class="rr-target">Target: ${r.t}</div>
+        </div>
+        <div class="rr-val" style="color:${r.met?'var(--green)':'var(--amber)'}">${r.val}</div>
+      </div>`).join('')}
+      <div style="margin-top:16px;padding:16px;border-radius:10px;text-align:center;background:${goGo?'var(--greenbg)':'var(--amberbg)'};border:1px solid ${goGo?'rgba(45,206,137,.3)':'rgba(244,162,97,.3)'}">
+        <div style="font-size:22px;font-weight:800;font-family:var(--font-head);color:${goGo?'var(--green)':'var(--amber)'}">
+          ${goGo?'🟢  GO':'🟡  IN PROGRESS'}
+        </div>
+        <div style="font-size:10px;color:var(--dim);margin-top:4px">UAT Go / No-Go Decision</div>
+      </div>
+    </div>`;
+
+  const recent=tests.filter(t=>t.lastUpdated).sort((a,b)=>b.lastUpdated.localeCompare(a.lastUpdated)).slice(0,20);
+  document.getElementById('actTbody').innerHTML=recent.length===0
+    ?'<tr><td colspan="6" style="text-align:center;color:var(--dim);padding:40px">No activity yet — start executing tests!</td></tr>'
+    :recent.map(t=>`<tr>
+      <td style="font-family:var(--font-mono);color:var(--blue);font-weight:700">${t.id}</td>
+      <td>${modPill(t.module)}</td>
+      <td style="font-size:11px;max-width:300px">${t.description.substring(0,80)}…</td>
+      <td>${badge(t.status)}</td>
+      <td style="font-size:11px">${t.updatedBy}</td>
+      <td style="font-size:10px;color:var(--dim);font-family:var(--font-mono)">${t.lastUpdated}</td>
+    </tr>`).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+// EXPORT / RESET
+// ════════════════════════════════════════════════════════════
+function exportCSV(){
+  const h='Test ID,Module,Step,High Level,Scenario,Description,Responsible,Lead,Status,Priority,Defect ID,Comments,Last Updated,Updated By';
+  const r=tests.map(t=>[t.id,t.module,t.stepNum,t.highLevel,t.scenario,t.description,t.responsible,t.lead,t.status,t.priority||'',t.defectId,t.comments,t.lastUpdated,t.updatedBy].map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','));
+  dl('SAP_UAT_Results_'+td()+'.csv',[h,...r].join('\n'));toast('Results CSV exported');
+}
+function exportDefCSV(){
+  const h='ID,Test Case,Title,Severity,Status,Raised By,Assignee,Description,Date';
+  const r=defects.map(d=>[d.id,d.testId,d.title,d.severity,d.status,d.raisedBy,d.assignee,d.description,d.raisedAt].map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','));
+  dl('SAP_UAT_Defects_'+td()+'.csv',[h,...r].join('\n'));toast('Defects CSV exported');
+}
+function td(){return new Date().toISOString().split('T')[0];}
+function dl(name,txt){const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(txt);a.download=name;a.click();}
+function resetAll(){
+  if(!confirm('Reset ALL test results and defects?\nThis cannot be undone.'))return;
+  tests=ALL_SEED.map(t=>({...t})); defects=[];
+  saveT(); saveD(); renderDash(); toast('Data reset');
+}
+
+// ════════════════════════════════════════════════════════════
+// MODALS
+// ════════════════════════════════════════════════════════════
+function closeModal(id){document.getElementById(id).classList.add('hidden');}
+document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.add('hidden');}));
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+try{document.getElementById('testerName').value=localStorage.getItem(LS_N)||'';}catch(e){}
+document.getElementById('testerName').addEventListener('input',e=>{try{localStorage.setItem(LS_N,e.target.value);}catch(e){}});
+renderDash();
+</script>
+</body>
+</html>
