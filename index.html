@@ -744,23 +744,233 @@ const BORDER_CLR = {
 
 const PRI_CLR = {'Critical':'var(--red2)','High':'var(--amber)','Medium':'var(--blue)'};
 
-const SHEETS_API = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
-const LS_T = 'sap_uat_T_v4';
-const LS_D = 'sap_uat_D_v4';
+const SHEETS_API = 'https://script.google.com/macros/s/AKfycbwpnNvzFWz1boV7kagdd6KP5pQD_v9RFUIMjGDmo9ZDEYBsmQAykiOGvqlDd7AJTDWw/exec';
 const LS_N = 'sap_uat_N_v4';
 
 // ════════════════════════════════════════════════════════════
 // STATE
 // ════════════════════════════════════════════════════════════
-let tests, defects;
-try { tests = JSON.parse(localStorage.getItem(LS_T)) || null; } catch(e){}
-try { defects = JSON.parse(localStorage.getItem(LS_D)) || null; } catch(e){}
-if (!tests) tests = ALL_SEED.map(t=>({...t}));
-if (!defects) defects = [];
-
+let tests = ALL_SEED.map(t=>({...t}));
+let defects = [];
 let editingId = null, scenFilt = '';
-function saveT() { try{localStorage.setItem(LS_T,JSON.stringify(tests));}catch(e){} }
-function saveD() { try{localStorage.setItem(LS_D,JSON.stringify(defects));}catch(e){} }
+let _syncing = false;
+
+// ── Loading overlay ──
+function showLoader(msg='Loading data…'){
+  let el=document.getElementById('loaderOverlay');
+  if(!el){
+    el=document.createElement('div');
+    el.id='loaderOverlay';
+    el.style.cssText='position:fixed;inset:0;background:rgba(240,243,248,.85);backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9000;gap:14px;';
+    el.innerHTML=`<div style="width:36px;height:36px;border:3px solid #dde3ef;border-top-color:#4895ef;border-radius:50%;animation:spin .7s linear infinite"></div>
+      <div id="loaderMsg" style="font-family:var(--font-mono);font-size:13px;color:#4a5570">${msg}</div>
+      <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
+    document.body.appendChild(el);
+  } else { document.getElementById('loaderMsg').textContent=msg; el.style.display='flex'; }
+}
+function hideLoader(){ const el=document.getElementById('loaderOverlay'); if(el) el.style.display='none'; }
+
+// ── Google Sheets API helpers ──
+async function apiGet(action){
+  const res = await fetch(`${SHEETS_API}?action=${action}`);
+  return res.json();
+}
+async function apiPost(action, payload){
+  const res = await fetch(SHEETS_API, {
+    method:'POST',
+    body: JSON.stringify(payload),
+    headers:{'Content-Type':'text/plain'}  // Apps Script requires text/plain for doPost
+  });
+  // Append action as query param so doPost can read it
+  return res.json().catch(()=>({}));
+}
+
+// Apps Script reads action from query string even on POST
+async function apiPostAction(action, payload){
+  const res = await fetch(`${SHEETS_API}?action=${action}`, {
+    method:'POST',
+    body: JSON.stringify(payload),
+    headers:{'Content-Type':'text/plain'}
+  });
+  return res.json().catch(()=>({}));
+}
+
+// ── Map sheet row object → internal test object ──
+function sheetRowToTest(row){
+  return {
+    id:           row['Test ID']      || '',
+    module:       row['Module']       || '',
+    stepNum:      row['Step']         || '',
+    highLevel:    row['High Level']   || '',
+    scenario:     row['Scenario']     || '',
+    description:  row['Description']  || '',
+    responsible:  row['Responsible']  || '',
+    lead:         row['Lead']         || '',
+    status:       row['Status']       || 'Not Started',
+    priority:     row['Priority']     || 'Medium',
+    defectId:     row['Defect ID']    || '',
+    comments:     row['Comments']     || '',
+    lastUpdated:  row['Last Updated'] || '',
+    updatedBy:    row['Updated By']   || '',
+  };
+}
+
+// ── Map sheet row → internal defect object ──
+function sheetRowToDefect(row){
+  return {
+    id:          row['Defect ID']   || '',
+    testId:      row['Test ID']     || '',
+    title:       row['Title']       || '',
+    severity:    row['Severity']    || 'Medium',
+    status:      row['Status']      || 'Open',
+    raisedBy:    row['Raised By']   || '',
+    assignee:    row['Assigned To'] || '',
+    description: row['Description'] || '',
+    raisedAt:    row['Raised At']   || '',
+  };
+}
+
+// ── Load all data from Sheets ──
+async function loadFromSheets(){
+  showLoader('Connecting to Google Sheets…');
+  const timeoutId = setTimeout(()=>{
+    hideLoader();
+    toast('Google Sheets timed out — dashboard loaded with local data','err');
+    renderDash();
+  }, 20000);
+  try {
+    const [testRows, defectRows] = await Promise.all([
+      apiGet('getTests'),
+      apiGet('getDefects')
+    ]);
+    clearTimeout(timeoutId);
+
+    const hasRealData = Array.isArray(testRows) && testRows.some(r => r['Test ID'] && String(r['Test ID']).trim() !== '');
+    if(hasRealData){
+      // Merge sheet statuses into seed data (seed provides full metadata)
+      const statusMap = {};
+      testRows.forEach(r => {
+        const id = r['Test ID'];
+        if(id) statusMap[id] = r;
+      });
+      tests = ALL_SEED.map(seed => {
+        const row = statusMap[seed.id];
+        if(row){
+          return { ...seed,
+            status:      row['Status']       || seed.status,
+            defectId:    row['Defect ID']    || seed.defectId,
+            comments:    row['Comments']     || seed.comments,
+            responsible: row['Responsible']  || seed.responsible,
+            lastUpdated: row['Last Updated'] || seed.lastUpdated,
+            updatedBy:   row['Updated By']   || seed.updatedBy,
+          };
+        }
+        return {...seed};
+      });
+    } else {
+      // Sheet is empty — push all seed rows to initialise it
+      showLoader('Initialising sheet with test cases…');
+      await pushAllTestsToSheet();
+    }
+
+    if(Array.isArray(defectRows)){
+      defects = defectRows.filter(r=>r['Defect ID']).map(sheetRowToDefect);
+    }
+
+    hideLoader();
+    renderDash();
+  } catch(err){
+    clearTimeout(timeoutId);
+    hideLoader();
+    toast('Could not reach Google Sheets — working offline','err');
+    console.error(err);
+    renderDash();
+  }
+}
+
+// ── Push ALL rows in ONE batch request (first-time init) ──
+async function pushAllTestsToSheet(){
+  const rows = tests.map(t=>({
+    'Test ID':      t.id,
+    'Module':       t.module,
+    'Step':         t.stepNum,
+    'High Level':   t.highLevel,
+    'Scenario':     t.scenario,
+    'Description':  t.description,
+    'Responsible':  t.responsible,
+    'Lead':         t.lead,
+    'Status':       t.status,
+    'Priority':     t.priority||'Medium',
+    'Defect ID':    t.defectId||'',
+    'Comments':     t.comments||'',
+    'Last Updated': t.lastUpdated||'',
+    'Updated By':   t.updatedBy||'',
+  }));
+  try {
+    const result = await apiPostAction('bulkInit', {rows});
+    if(result && result.error) throw new Error(result.error);
+    toast('Sheet initialised with '+rows.length+' test cases ✓');
+  } catch(err){
+    console.warn('bulkInit failed:', err);
+    toast('Sheet init failed — check Apps Script deployment','err');
+  }
+}
+
+// ── Save a single test update to Sheets ──
+async function saveT(t){
+  try {
+    await apiPostAction('updateTest', {
+      'Test ID':      t.id,
+      'Module':       t.module,
+      'Step':         t.stepNum,
+      'High Level':   t.highLevel,
+      'Scenario':     t.scenario,
+      'Description':  t.description,
+      'Responsible':  t.responsible,
+      'Lead':         t.lead,
+      'Status':       t.status,
+      'Priority':     t.priority||'Medium',
+      'Defect ID':    t.defectId||'',
+      'Comments':     t.comments||'',
+      'Last Updated': t.lastUpdated||'',
+      'Updated By':   t.updatedBy||'',
+    });
+  } catch(err){ toast('Sync error — changes may not have saved','err'); console.error(err); }
+}
+
+// ── Save a new defect to Sheets ──
+async function saveD(d){
+  try {
+    await apiPostAction('addDefect', {
+      'Defect ID':   d.id,
+      'Test ID':     d.testId,
+      'Title':       d.title,
+      'Severity':    d.severity,
+      'Status':      d.status,
+      'Raised By':   d.raisedBy,
+      'Assigned To': d.assignee,
+      'Description': d.description,
+      'Raised At':   d.raisedAt,
+    });
+  } catch(err){ toast('Defect sync error','err'); console.error(err); }
+}
+
+// ── Update defect status in Sheets ──
+async function saveDUpdate(d){
+  try {
+    await apiPostAction('updateDefect', {
+      'Defect ID':   d.id,
+      'Test ID':     d.testId,
+      'Title':       d.title,
+      'Severity':    d.severity,
+      'Status':      d.status,
+      'Raised By':   d.raisedBy,
+      'Assigned To': d.assignee,
+      'Description': d.description,
+      'Raised At':   d.raisedAt,
+    });
+  } catch(err){ toast('Defect sync error','err'); console.error(err); }
+}
 
 // ════════════════════════════════════════════════════════════
 // COMPUTED
@@ -957,11 +1167,12 @@ function renderTcList(){
   }).join('')||`<div style="text-align:center;padding:60px;color:var(--dim)">No test cases match your filters</div>`;
 }
 
-function qStatus(id,status){
+async function qStatus(id,status){
   if(!tester()){toast('Enter your name first (top right)','err');return;}
   const t=tests.find(x=>x.id===id); if(!t) return;
   t.status=status; t.lastUpdated=now(); t.updatedBy=tester();
-  saveT(); renderTcList(); renderDash(); toast(id+' → '+status);
+  renderTcList(); renderDash(); toast(id+' → '+status+' · syncing…');
+  await saveT(t); toast(id+' → '+status+' ✓ saved');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -978,7 +1189,7 @@ function openEdit(id){
   document.getElementById('editResponsible').value=t.responsible||'';
   document.getElementById('editModal').classList.remove('hidden');
 }
-function saveEdit(){
+async function saveEdit(){
   if(!tester()){toast('Enter your name first','err');return;}
   const t=tests.find(x=>x.id===editingId);
   t.status=document.getElementById('editStatus').value;
@@ -986,7 +1197,8 @@ function saveEdit(){
   t.comments=document.getElementById('editComments').value;
   t.responsible=document.getElementById('editResponsible').value;
   t.lastUpdated=now(); t.updatedBy=tester();
-  saveT(); closeModal('editModal'); renderTcList(); toast(editingId+' updated');
+  closeModal('editModal'); renderTcList(); toast(editingId+' syncing…');
+  await saveT(t); toast(editingId+' ✓ saved');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -997,18 +1209,24 @@ function openDefectModal(testId){
   document.getElementById('defSev').value='Medium';
   document.getElementById('defectModal').classList.remove('hidden');
 }
-function saveDefect(){
+async function saveDefect(){
   const title=document.getElementById('defTitle').value.trim();
   if(!title){toast('Enter a defect title','err');return;}
   const testId=document.getElementById('defTestId').value.trim();
   const id='DEF-'+String(defects.length+1).padStart(3,'0');
-  defects.push({id,testId,title,severity:document.getElementById('defSev').value,
+  const defObj={id,testId,title,severity:document.getElementById('defSev').value,
     assignee:document.getElementById('defAssignee').value,
     description:document.getElementById('defDesc').value,
-    status:'Open',raisedBy:tester()||'Unknown',raisedAt:now()});
-  saveD();
-  if(testId){const t=tests.find(x=>x.id===testId);if(t){t.status='Fail';t.defectId=id;t.lastUpdated=now();t.updatedBy=tester()||'Unknown';saveT();}}
-  closeModal('defectModal'); renderDefects(); toast(id+' raised');
+    status:'Open',raisedBy:tester()||'Unknown',raisedAt:now()};
+  defects.push(defObj);
+  closeModal('defectModal'); renderDefects(); toast(id+' syncing…');
+  await saveD(defObj);
+  if(testId){
+    const t=tests.find(x=>x.id===testId);
+    if(t){t.status='Fail';t.defectId=id;t.lastUpdated=now();t.updatedBy=tester()||'Unknown';
+    await saveT(t);}
+  }
+  toast(id+' ✓ raised & saved');
 }
 
 function renderDefects(){
@@ -1028,7 +1246,7 @@ function renderDefects(){
       <td style="font-family:var(--font-mono);color:var(--blue)">${d.testId||'—'}</td>
       <td>${d.title}</td>
       <td><span style="color:${sc[d.severity]};font-weight:700;font-family:var(--font-mono);font-size:10px">${d.severity}</span></td>
-      <td><select onchange="updDef('${d.id}',this.value)" style="background:var(--ink3);border:1px solid rgba(255,255,255,.12);color:var(--fog);padding:4px 8px;border-radius:5px;font-size:11px;font-family:var(--font-body);outline:none;">
+      <td><select onchange="updDef('${d.id}',this.value)" style="background:#ffffff;border:1px solid #c8d0e0;color:#2e3d58;padding:4px 8px;border-radius:5px;font-size:11px;font-family:var(--font-body);outline:none;">
         ${['Open','In Progress','Resolved','Closed',"Won't Fix"].map(s=>`<option ${d.status===s?'selected':''}>${s}</option>`).join('')}
       </select></td>
       <td style="font-size:11px">${d.raisedBy}</td>
@@ -1037,8 +1255,15 @@ function renderDefects(){
       <td><button class="btn btn-fail btn-sm" onclick="delDef('${d.id}')">Del</button></td>
     </tr>`).join('');
 }
-function updDef(id,status){const d=defects.find(x=>x.id===id);if(d){d.status=status;saveD();renderDefects();toast(id+' → '+status);}}
-function delDef(id){if(!confirm('Delete '+id+'?'))return;defects=defects.filter(x=>x.id!==id);saveD();renderDefects();toast(id+' deleted');}
+async function updDef(id,status){
+  const d=defects.find(x=>x.id===id);
+  if(d){d.status=status; renderDefects(); toast(id+' syncing…');
+  await saveDUpdate(d); toast(id+' → '+status+' ✓ saved');}
+}
+function delDef(id){
+  if(!confirm('Delete '+id+'?\nNote: this only removes it from the dashboard view, not from the Google Sheet.'))return;
+  defects=defects.filter(x=>x.id!==id); renderDefects(); toast(id+' removed from view');
+}
 
 // ════════════════════════════════════════════════════════════
 // WEEKLY
@@ -1173,10 +1398,12 @@ function exportDefCSV(){
 }
 function td(){return new Date().toISOString().split('T')[0];}
 function dl(name,txt){const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(txt);a.download=name;a.click();}
-function resetAll(){
-  if(!confirm('Reset ALL test results and defects?\nThis cannot be undone.'))return;
+async function resetAll(){
+  if(!confirm('Reset ALL test results and defects?\nThis will clear statuses in Google Sheets too.\nThis cannot be undone.'))return;
   tests=ALL_SEED.map(t=>({...t})); defects=[];
-  saveT(); saveD(); renderDash(); toast('Data reset');
+  showLoader('Resetting data in Google Sheets…');
+  await pushAllTestsToSheet();
+  hideLoader(); renderDash(); toast('Data reset ✓');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1190,7 +1417,9 @@ document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>
 // ════════════════════════════════════════════════════════════
 try{document.getElementById('testerName').value=localStorage.getItem(LS_N)||'';}catch(e){}
 document.getElementById('testerName').addEventListener('input',e=>{try{localStorage.setItem(LS_N,e.target.value);}catch(e){}});
-renderDash();
+
+// Load live data from Google Sheets on startup
+loadFromSheets();
 </script>
 </body>
 </html>
